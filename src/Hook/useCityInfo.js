@@ -22,7 +22,7 @@ function useCityInfo(phrase = "") {
         }, [phrase]);
 
   
-  console.log(phrase , CityInfor);
+  // console.log(phrase , CityInfor);
 
 
   return CityInfor;

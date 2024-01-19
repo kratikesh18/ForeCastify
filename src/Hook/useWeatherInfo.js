@@ -3,8 +3,8 @@ import confs from '../confs/confs'
 
 
 
-function useWeatherInfo({lat , lon , name }) {
-  console.log(lat, lon, name)
+function useWeatherInfo({lat , lon, name  }) {
+
   const [data, setData] = useState(null)
 
   useEffect(()=>{
@@ -22,7 +22,7 @@ function useWeatherInfo({lat , lon , name }) {
     }
   },[lat, lon, name])
 
-console.log("Data is : ",data)
+  
 
 return data
 

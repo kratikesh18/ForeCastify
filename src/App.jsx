@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./App.css";
 
 import useCityInfo from "./Hook/useCityInfo.js";
@@ -11,6 +11,8 @@ function App() {
   const [geoInfo, setGeoInfo] = useState({});
   const [cityVisible, setCityVisible] = useState(true);
   const [weatherVisible, setWeatherVisible] = useState(false);
+
+  // hooks
   const cityInfo = useCityInfo(cityName);
   const weatherInfo = useWeatherInfo(geoInfo);
 
@@ -20,6 +22,10 @@ function App() {
   }, 600);
 
   const handleOnClick = (lat, lon, name) => {
+    localStorage.setItem("lat", lat);
+    localStorage.setItem("lon", lon);
+    localStorage.setItem("name", name);
+
     setGeoInfo({ lat, lon, name });
     setWeatherVisible(true);
     setCityVisible(false);
@@ -30,9 +36,18 @@ function App() {
     setCityVisible(true);
   };
 
+  useEffect(() => {
+    if (localStorage.length > 0) {
+      const { lat, lon, name } = localStorage;
+      setGeoInfo({ lat, lon, name });
+      setWeatherVisible(true);
+      setCityVisible(false);
+    }
+  }, [localStorage]);
+
   return (
-    <div className="w-screen flex-col gap-8 h-screen bg-black text-white flex justify-center items-center ">
-      {cityVisible && (
+    <div className="w-screen flex-col gap-8 h-screen custom-gradient text-white flex justify-center items-center ">
+      {cityVisible  && (
         <div className="flex flex-col gap-4">
           <div className="flex flex-col ">
             <label htmlFor="selectCity" className="mb-2 text-lg font-bold ">
@@ -67,18 +82,26 @@ function App() {
       {weatherInfo && weatherVisible && (
         <div className="text-white text-center text-xl ">
           <div className="flex justify-center items-center">
+            <h1>
+              Showing Weather of{" "}
+              <span className="font-bold">{geoInfo.name}</span>
+            </h1>
+            
+            <img
+              src={` https://openweathermap.org/img/wn/${weatherInfo.weather[0].icon}@2x.png`}
+              className="w-[5rem] "
+              alt=""
+            />
+            
 
-          <h1>Showing Weather of <span className="font-bold">{geoInfo.name}</span></h1>
-
-          <img src={` https://openweathermap.org/img/wn/${weatherInfo.weather[0].icon}@2x.png`}  className="w-[5rem] " alt="" />
           </div>
+          
+          <div>
+            <h1>Temp</h1>
+            <h1 className="text-2xl font-extrabold">{weatherInfo.main.temp} <span>&deg;C</span></h1>
+          </div>
+          
           <div className="flex mt-4 gap-8  justify-between border-2 border-white p-8 bg-slate-900 rounded-md">
-            <div>
-              <h2>Temp</h2>
-              <p>
-                {weatherInfo && weatherInfo.main.temp} <span> &deg; C</span>
-              </p>
-            </div>
             <div>
               <h2>Feels Like</h2>
               <p>
@@ -86,17 +109,32 @@ function App() {
                 <span> &deg; C</span>
               </p>
             </div>
+
             <div>
               <h2>Humidity</h2>
               <p>
                 {weatherInfo && weatherInfo.main.humidity} <span>%</span>
               </p>
             </div>
+
+            <div>
+              <h2>Wind Speed</h2>
+              <p>
+                {weatherInfo && weatherInfo.wind.speed} <span>km/h</span>
+              </p>
+            </div>
           </div>
         </div>
       )}
 
-      {weatherVisible && <button className="border-2 p-2 rounded-md hover:bg-gray-600/50" onClick={handleChangeCity}>ChangeCity</button>}
+      {weatherVisible && weatherInfo && (
+        <button
+          className="border-2 p-2 rounded-md hover:bg-gray-600/50"
+          onClick={handleChangeCity}
+        >
+          ChangeCity
+        </button>
+      )}
     </div>
   );
 }
